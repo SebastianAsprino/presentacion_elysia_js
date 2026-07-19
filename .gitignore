@@ -1,14 +1,1 @@
-/GUION.md
-/README.md
-/bench
-/bun.lock
-/components
-/dist
-/global-bottom.vue
-/node_modules
-/package.json
-/public
-/setup
-/slides.md
-/style.css
-/uno.config.ts
+node_modules
