@@ -583,17 +583,22 @@ zoom: 0.95
 
 <!--
 Nada de números de terceros: lo medimos aquí y ahora. Los seis servicios
-devuelven el mismo "hello world", corren en el mismo host (bench/ del repo,
-desplegado con docker compose) y las peticiones salen de este navegador.
+devuelven el mismo "hello world" y corren en el mismo host (bench/ del repo,
+desplegado con docker compose). La carga la genera el servicio runner,
+colocado junto a los servicios, no el navegador de quien esté viendo la
+presentación — así el resultado no depende de la red de la sala ni del wifi
+del evento, que si no hacían que el número saltara de una corrida a otra y
+se perdía el punto de la demo.
 Se suman Fastify (Node), Django (Python) y Spring Boot (Java 8 — la versión
 "empresarial", no la última) para tener representación fuera del mundo
 Node.js y JS/TS.
-Advertir el matiz: medimos latencia HTTP end-to-end desde el navegador (incluye
-red), no throughput puro de servidor — por eso el diferencial es menor que el
-21× de TechEmpower, pero el orden se mantiene.
-Si no hay red / el server no responde: el input permite cambiar la URL en vivo
-(p. ej. localhost:8080 con docker compose up local) y la slide anterior ya
-mostró el benchmark de referencia.
+Advertir el matiz: aun así es un benchmark sintético (un solo endpoint, red
+interna de Docker) — el orden relativo importa más que el número exacto, y es
+menor que el 21× de TechEmpower porque ahí se mide throughput puro sin red de
+por medio.
+Si el runner no responde: el input permite cambiar la URL en vivo (p. ej.
+localhost:8080 con docker compose up local) y la slide anterior ya mostró el
+benchmark de referencia.
 -->
 
 ---

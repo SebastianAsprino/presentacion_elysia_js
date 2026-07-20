@@ -16,7 +16,6 @@ const base = ref(props.defaultBase ?? 'http://localhost:8080')
 const total = ref(props.defaultTotal ?? 1000)
 const running = ref(false)
 const errorMsg = ref('')
-const mode = ref<'server' | 'browser'>('server')
 
 interface FwState {
   count: number
@@ -37,8 +36,6 @@ const winner = ref<number | null>(null)
 
 const canvasEl = ref<HTMLCanvasElement>()
 let samples: number[][] = FWS.map(() => [])
-const CONCURRENCY = 20
-const WARMUP = 10
 
 onMounted(() => {
   const saved = localStorage.getItem('elysia-bench-base')
@@ -152,35 +149,6 @@ let aborter: AbortController | null = null
 
 class CancelledError extends Error {}
 
-async function fetchOne(f: number, record: boolean) {
-  const st = states.value[f]
-  const t0 = performance.now()
-  try {
-    const res = await fetch(`${base.value.replace(/\/$/, '')}/${FWS[f].key}`, {
-      cache: 'no-store',
-      // timeout por petición: una conexión colgada no puede congelar el run
-      signal: AbortSignal.any([aborter!.signal, AbortSignal.timeout(8000)]),
-    })
-    await res.text() // consumir el body: libera la conexión para reutilizarla
-    const dt = performance.now() - t0
-    if (!res.ok)
-      throw new Error(`HTTP ${res.status}`)
-    if (record) {
-      samples[f].push(dt)
-      st.count++
-      st.sum += dt
-    }
-  }
-  catch (e) {
-    if (aborter?.signal.aborted)
-      throw new CancelledError()
-    if (record)
-      st.errors++
-    else
-      throw e
-  }
-}
-
 let currentEs: EventSource | null = null
 
 function cancel() {
@@ -189,9 +157,11 @@ function cancel() {
   currentEs = null
 }
 
-/** Modo servidor: el runner (colocado junto a los servicios) genera la carga
- *  estilo `oha` y nos transmite cada latencia por SSE. */
-function runServerFw(f: number): Promise<void> {
+/** El runner (colocado junto a los servicios) genera la carga estilo `oha`
+ *  y nos transmite cada latencia por SSE — es un benchmark sintético
+ *  servidor-a-servidor, sin la varianza de la red del navegador de quien
+ *  esté viendo la presentación. */
+function runFw(f: number): Promise<void> {
   const st = states.value[f]
   return new Promise<void>((resolve, reject) => {
     const url = `${base.value.replace(/\/$/, '')}/runner/run?fw=${FWS[f].key}&n=${total.value}&c=50`
@@ -230,7 +200,7 @@ function runServerFw(f: number): Promise<void> {
       currentEs = null
       reject(cancelled
         ? new CancelledError()
-        : new Error('runner no disponible — ¿desplegaste la versión con el servicio runner? (o cambia a modo Navegador)'))
+        : new Error('runner no disponible — ¿desplegaste la versión con el servicio runner?'))
     }
   })
 }
@@ -251,32 +221,7 @@ async function run() {
     for (let f = 0; f < FWS.length; f++) {
       const st = states.value[f]
       st.running = true
-
-      if (mode.value === 'server') {
-        await runServerFw(f)
-      }
-      else {
-        // warm-up (no cuenta): despierta conexiones/JIT
-        await Promise.all(Array.from({ length: WARMUP }, () => fetchOne(f, false)))
-
-        const n = total.value
-        let next = 0
-        const t0 = performance.now()
-        await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
-          while (true) {
-            const i = next++
-            if (i >= n)
-              break
-            await fetchOne(f, true)
-            if ((i & 7) === 0)
-              scheduleRedraw()
-          }
-        }))
-        const wall = (performance.now() - t0) / 1000
-        st.avg = st.count ? st.sum / st.count : null
-        st.rps = wall > 0 ? Math.round(st.count / wall) : null
-      }
-
+      await runFw(f)
       st.running = false
       st.done = true
       scheduleRedraw()
@@ -335,24 +280,6 @@ async function run() {
 
     <!-- controles -->
     <div class="flex items-center gap-3">
-      <div class="flex rounded-lg border border-zinc-700 overflow-hidden text-xs font-mono shrink-0">
-        <button
-          :disabled="running"
-          class="px-3 py-1.5 transition"
-          :class="mode === 'server' ? 'bg-sky-500/20 text-sky-300' : 'opacity-50 hover:opacity-80'"
-          @click="mode = 'server'"
-        >
-          servidor
-        </button>
-        <button
-          :disabled="running"
-          class="px-3 py-1.5 transition border-l border-zinc-700"
-          :class="mode === 'browser' ? 'bg-fuchsia-500/20 text-fuchsia-300' : 'opacity-50 hover:opacity-80'"
-          @click="mode = 'browser'"
-        >
-          navegador
-        </button>
-      </div>
       <input
         v-model="base"
         :disabled="running"

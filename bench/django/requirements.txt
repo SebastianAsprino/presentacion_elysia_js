@@ -1,2 +1,4 @@
-Django==5.1.6
+# Django 4.2 LTS a propósito (no la última): igual que Spring Boot con
+# Java 8, es la versión "empresarial" que de verdad sigue en producción.
+Django>=4.2,<4.3
 gunicorn==23.0.0
