@@ -1,0 +1,11 @@
+{
+  "name": "bench-elysia",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun index.ts"
+  },
+  "dependencies": {
+    "elysia": "^1.4.0"
+  }
+}
