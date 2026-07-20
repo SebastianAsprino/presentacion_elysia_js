@@ -5,7 +5,10 @@ const props = defineProps<{ defaultBase?: string, defaultTotal?: number }>()
 
 const FWS = [
   { key: 'express', label: 'Express', color: '#a1a1aa' },
+  { key: 'fastify', label: 'Fastify', color: '#fbbf24' },
   { key: 'nest', label: 'NestJS', color: '#f43f5e' },
+  { key: 'django', label: 'Django', color: '#4ade80' },
+  { key: 'springboot', label: 'Spring Boot', color: '#2dd4bf' },
   { key: 'elysia', label: 'Elysia', color: '#60a5fa' },
 ] as const
 
@@ -33,7 +36,7 @@ const states = ref<FwState[]>(FWS.map(emptyState))
 const winner = ref<number | null>(null)
 
 const canvasEl = ref<HTMLCanvasElement>()
-let samples: number[][] = [[], [], []]
+let samples: number[][] = FWS.map(() => [])
 const CONCURRENCY = 20
 const WARMUP = 10
 
@@ -98,9 +101,9 @@ function redraw() {
     ctx.fillText(`${(yMax * frac).toFixed(0)} ms`, padL - 6, y + 3)
   }
 
-  const segW = plotW / 3
+  const segW = plotW / FWS.length
   ctx.textAlign = 'center'
-  for (let f = 0; f < 3; f++) {
+  for (let f = 0; f < FWS.length; f++) {
     const x0 = padL + f * segW
     // separador de segmento
     if (f > 0) {
@@ -239,13 +242,13 @@ async function run() {
   errorMsg.value = ''
   winner.value = null
   states.value = FWS.map(emptyState)
-  samples = [[], [], []]
+  samples = FWS.map(() => [])
   aborter = new AbortController()
   localStorage.setItem('elysia-bench-base', base.value)
   redraw()
 
   try {
-    for (let f = 0; f < 3; f++) {
+    for (let f = 0; f < FWS.length; f++) {
       const st = states.value[f]
       st.running = true
 
@@ -298,7 +301,7 @@ async function run() {
 
 <template>
   <div class="flex flex-col gap-4 w-full">
-    <!-- los 3 frameworks -->
+    <!-- los frameworks -->
     <div class="grid grid-cols-3 gap-4">
       <div
         v-for="(fw, f) in FWS"
@@ -308,7 +311,10 @@ async function run() {
         :style="states[f].running ? { borderColor: fw.color } : {}"
       >
         <div v-if="fw.key === 'express'" class="i-simple-icons:express text-3xl text-white" />
+        <div v-else-if="fw.key === 'fastify'" class="i-simple-icons:fastify text-3xl text-white" />
         <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-3xl" />
+        <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-3xl" />
+        <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-3xl" />
         <img v-else src="/elysia.svg" class="h-8">
         <div class="flex flex-col leading-tight">
           <span class="font-semibold" :style="{ color: fw.color }">{{ fw.label }}</span>
@@ -364,7 +370,7 @@ async function run() {
         class="px-4 py-1.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#60a5fa] to-[#e879f9] hover:brightness-110 transition"
         @click="run"
       >
-        Ejecutar 3 × {{ total }}
+        Ejecutar {{ FWS.length }} × {{ total }}
       </button>
       <button
         v-else

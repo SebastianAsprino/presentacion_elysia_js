@@ -1,12 +1,15 @@
-# Bench en vivo — Express vs NestJS vs Elysia
+# Bench en vivo — Express vs Fastify vs NestJS vs Django vs Spring Boot vs Elysia
 
-Tres microservicios idénticos (un `GET` que devuelve `hello world` en texto plano)
+Seis microservicios idénticos (un `GET` que devuelve `hello world` en texto plano)
 más un gateway nginx que los expone bajo una sola URL:
 
 | Ruta | Servicio | Stack |
 |---|---|---|
 | `/express` | express:3000 | Node 22 + Express 4 |
+| `/fastify` | fastify:3000 | Node 22 + Fastify 5 |
 | `/nest` | nest:3000 | Node 22 + NestJS 11 (adapter Express) |
+| `/django` | django:3000 | Python 3.12 + Django 5 (gunicorn, 4 workers) |
+| `/springboot` | spring-boot:3000 | Java 8 + Spring Boot 2.7 (versión "empresarial": última minor con soporte JDK 8, no la más reciente) |
 | `/elysia` | elysia:3000 | Bun 1 + Elysia 1 |
 | `/runner/run?fw=elysia&n=1000&c=50` | runner:3000 | Generador de carga estilo `oha` (Bun): mide por red interna con `c` conexiones concurrentes y transmite cada latencia por SSE — es el modo "servidor" de la slide |
 
@@ -18,22 +21,28 @@ el navegador no cachee y el benchmark sea real).
 
 1. Crear un servicio de tipo **Docker Compose** apuntando a esta carpeta (`bench/`).
 2. Asignar el dominio al servicio **gateway**, puerto **80**.
-3. Verificar: `https://tu-dominio/express`, `/nest` y `/elysia` deben responder `hello world`.
+3. Verificar: `https://tu-dominio/express`, `/fastify`, `/nest`, `/django`,
+   `/springboot` y `/elysia` deben responder `hello world`.
 
 > ⚠️ Usa un dominio **https**: la presentación (si la sirves desde Cloudflare u
 > otra web https) no puede hacer fetch a un backend http (mixed content).
 > Presentando en local (`bun run dev`) también funciona contra http.
 
+> ⚠️ El build de `spring-boot` compila con Maven dentro de Docker (imagen
+> `maven:3.9-eclipse-temurin-8`) y tarda más que el resto en el primer build.
+
 ## Prueba local (opcional)
 
 ```bash
 docker compose up --build
-curl localhost:8080/express localhost:8080/nest localhost:8080/elysia
+curl localhost:8080/express localhost:8080/fastify localhost:8080/nest \
+     localhost:8080/django localhost:8080/springboot localhost:8080/elysia
 ```
 
 ## La slide
 
 El componente [`components/LiveBench.vue`](../components/LiveBench.vue) (slide
 "Benchmark en vivo") pide la URL base, hace un warm-up y luego 1000 peticiones
-por framework en orden Express → Nest → Elysia, dibuja la línea de tiempo con
-la latencia de cada respuesta y muestra el promedio por framework al terminar.
+por framework en orden Express → Fastify → Nest → Django → Spring Boot → Elysia,
+dibuja la línea de tiempo con la latencia de cada respuesta y muestra el
+promedio por framework al terminar.

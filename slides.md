@@ -577,14 +577,17 @@ zoom: 0.95
 
 # Benchmark en vivo
 
-<div text-sm opacity-50 mb-4>1000 peticiones reales por framework, en orden y contra el mismo servidor · Express → NestJS → Elysia</div>
+<div text-sm opacity-50 mb-4>1000 peticiones reales por framework, en orden y contra el mismo servidor · Express → Fastify → NestJS → Django → Spring Boot → Elysia</div>
 
 <LiveBench default-base="https://prueba.asprino.dev" />
 
 <!--
-Nada de números de terceros: lo medimos aquí y ahora. Los tres servicios
+Nada de números de terceros: lo medimos aquí y ahora. Los seis servicios
 devuelven el mismo "hello world", corren en el mismo host (bench/ del repo,
 desplegado con docker compose) y las peticiones salen de este navegador.
+Se suman Fastify (Node), Django (Python) y Spring Boot (Java 8 — la versión
+"empresarial", no la última) para tener representación fuera del mundo
+Node.js y JS/TS.
 Advertir el matiz: medimos latencia HTTP end-to-end desde el navegador (incluye
 red), no throughput puro de servidor — por eso el diferencial es menor que el
 21× de TechEmpower, pero el orden se mantiene.
@@ -600,39 +603,60 @@ glowSeed: 31
 
 # Cara a cara
 
-<div mt-8 grid grid-cols-4 gap-y-4 gap-x-2 text-center items-center>
+<div mt-8 grid grid-cols-7 gap-y-4 gap-x-1 text-center items-center text-sm>
   <div />
-  <div flex items-center justify-center gap-2><div i-simple-icons:express text-white /> Express</div>
-  <div flex items-center justify-center gap-2><div i-logos:nestjs /> NestJS</div>
-  <div flex items-center justify-center gap-2><img src="/elysia.svg" class="h-5"> Elysia</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><div i-simple-icons:express text-lg text-white /> Express</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><div i-simple-icons:fastify text-lg text-white /> Fastify</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><div i-logos:nestjs text-lg /> NestJS</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><div i-logos:django-icon text-lg /> Django</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><div i-logos:spring-icon text-lg /> Spring Boot</div>
+  <div flex flex-col items-center justify-center gap-1 text-xs><img src="/elysia.svg" class="h-4"> Elysia</div>
 
-  <div v-click="1" text-left text-sm opacity-80>Tipado end-to-end</div>
+  <div v-click="1" text-left text-xs opacity-80>Tipado end-to-end</div>
+  <div v-click="1"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
+  <div v-click="1"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
+  <div v-click="1"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
   <div v-click="1"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
   <div v-click="1"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
   <div v-click="1"><div i-carbon:checkmark-filled text-green-400 ma /></div>
 
-  <div v-click="2" text-left text-sm opacity-80>Validación integrada</div>
+  <div v-click="2" text-left text-xs opacity-80>Validación integrada</div>
   <div v-click="2"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
   <div v-click="2"><div i-carbon:checkmark-filled text-green-400 ma /></div>
   <div v-click="2"><div i-carbon:checkmark-filled text-green-400 ma /></div>
+  <div v-click="2"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
+  <div v-click="2"><div i-carbon:checkmark-filled text-green-400 ma /></div>
+  <div v-click="2"><div i-carbon:checkmark-filled text-green-400 ma /></div>
 
-  <div v-click="3" text-left text-sm opacity-80>OpenAPI automático</div>
+  <div v-click="3" text-left text-xs opacity-80>OpenAPI automático</div>
+  <div v-click="3"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
+  <div v-click="3"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
+  <div v-click="3"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
   <div v-click="3"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
   <div v-click="3"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
   <div v-click="3"><div i-carbon:checkmark-filled text-green-400 ma /></div>
 
-  <div v-click="4" text-left text-sm opacity-80>Performance</div>
-  <div v-click="4" font-mono text-sm opacity-60>1×</div>
-  <div v-click="4" font-mono text-sm opacity-60>~1–2×</div>
-  <div v-click="4" font-mono text-sm class="text-gradient-elysia" font-bold>~21×</div>
+  <div v-click="4" text-left text-xs opacity-80>Performance</div>
+  <div v-click="4" font-mono text-xs opacity-60>1×</div>
+  <div v-click="4" font-mono text-xs opacity-60>~1.5×</div>
+  <div v-click="4" font-mono text-xs opacity-60>~1–2×</div>
+  <div v-click="4" font-mono text-xs opacity-60>~0.5×</div>
+  <div v-click="4" font-mono text-xs opacity-60>~3–5×</div>
+  <div v-click="4" font-mono text-xs class="text-gradient-elysia" font-bold>~21×</div>
 
-  <div v-click="5" text-left text-sm opacity-80>Madurez / ecosistema</div>
+  <div v-click="5" text-left text-xs opacity-80>Madurez / ecosistema</div>
+  <div v-click="5"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
+  <div v-click="5"><div i-carbon:checkmark-filled text-green-400 ma /></div>
+  <div v-click="5"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
   <div v-click="5"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
   <div v-click="5"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
   <div v-click="5"><div i-carbon:in-progress text-sky-400 ma /></div>
 
-  <div v-click="6" text-left text-sm opacity-80>Estructura para equipos grandes</div>
+  <div v-click="6" text-left text-xs opacity-80>Estructura para equipos grandes</div>
   <div v-click="6"><div i-carbon:close-filled text-red-400 opacity-60 ma /></div>
+  <div v-click="6"><div i-carbon:warning-alt-filled text-yellow-400 opacity-80 ma /></div>
+  <div v-click="6"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
+  <div v-click="6"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
   <div v-click="6"><div flex justify-center gap-1><div i-carbon:checkmark-filled text-green-400 /><div i-carbon:checkmark-filled text-green-400 /></div></div>
   <div v-click="6"><div i-carbon:checkmark-filled text-green-400 ma /></div>
 </div>
@@ -641,6 +665,15 @@ glowSeed: 31
 El "warning" de Nest en tipado E2E: se puede lograr con OpenAPI codegen o
 librerías extra, pero no viene de serie ni es instantáneo como Eden.
 La performance de Nest depende del adapter (Express por defecto, Fastify opcional).
+Fastify: valida con JSON Schema de serie (por eso el check en "validación"),
+pero no comparte tipos con el cliente sin trabajo extra.
+Django: sin Django REST Framework la validación/OpenAPI son manuales — con
+DRF sube a nivel Nest, pero no viene de fábrica.
+Spring Boot: Bean Validation y springdoc-openapi son estándar de facto en el
+ecosistema, aunque piden dependencias y configuración explícitas.
+Los multiplicadores de performance son órdenes de magnitud ilustrativos (JVM
+calentada y Node suelen moverse en ligas distintas a CPython síncrono), no
+una medición equivalente a la del benchmark en vivo de la slide anterior.
 -->
 
 ---
@@ -662,40 +695,65 @@ glowSeed: 45
 
 # Cada uno tiene su sitio
 
-<div grid grid-cols-3 gap-6 mt-10>
-  <div v-click="1" flex flex-col gap-3 p-6 rounded-xl border border-zinc-800 bg="zinc-900/50">
-    <div flex items-center gap-3><div i-simple-icons:express text-3xl text-white /><span text-xl font-semibold>Express</span></div>
-    <div text-sm opacity-70 flex flex-col gap-2 mt-2>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Mantener sistemas existentes</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Equipos que ya lo dominan</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Middleware para todo lo imaginable</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Prototipos sin requisitos de tipado</div>
+<div grid grid-cols-3 gap-4 mt-6 text-sm>
+  <div v-click="1" flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg="zinc-900/50">
+    <div flex items-center gap-3><div i-simple-icons:express text-2xl text-white /><span text-lg font-semibold>Express</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Mantener sistemas existentes</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Equipos que ya lo dominan</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Middleware para todo lo imaginable</div>
     </div>
   </div>
-  <div v-click="2" flex flex-col gap-3 p-6 rounded-xl border border-zinc-800 bg="zinc-900/50">
-    <div flex items-center gap-3><div i-logos:nestjs text-3xl /><span text-xl font-semibold>NestJS</span></div>
-    <div text-sm opacity-70 flex flex-col gap-2 mt-2>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Corporativo / enterprise</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Equipos grandes con rotación</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Microservicios, colas, gRPC de serie</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 /> Convenciones fuertes ante todo</div>
+  <div v-click="2" flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg="zinc-900/50">
+    <div flex items-center gap-3><div i-simple-icons:fastify text-2xl text-white /><span text-lg font-semibold>Fastify</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Node "sin sorpresas", cerca del metal</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Validación por JSON Schema de serie</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> APIs internas de alto throughput</div>
     </div>
   </div>
-  <div v-click="3" flex flex-col gap-3 p-6 rounded-xl border border-sky-900 bg="sky-950/20">
-    <div flex items-center gap-3><img src="/elysia.svg" class="h-8"><span text-xl font-semibold>Elysia</span></div>
-    <div text-sm opacity-70 flex flex-col gap-2 mt-2>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 text-sky-400 /> Startups y productos nuevos</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 text-sky-400 /> APIs donde el rendimiento es dinero</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 text-sky-400 /> Equipos TypeScript-first</div>
-      <div flex items-start gap-2><div i-carbon:arrow-right mt-1 shrink-0 text-sky-400 /> Full-stack TS: contrato compartido sin codegen</div>
+  <div v-click="3" flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg="zinc-900/50">
+    <div flex items-center gap-3><div i-logos:nestjs text-2xl /><span text-lg font-semibold>NestJS</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Corporativo / enterprise</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Equipos grandes con rotación</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Microservicios, colas, gRPC de serie</div>
+    </div>
+  </div>
+  <div v-click="4" flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg="zinc-900/50">
+    <div flex items-center gap-3><div i-logos:django-icon text-2xl /><span text-lg font-semibold>Django</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Backends con mucho CRUD/admin</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> ORM + panel admin de fábrica</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Equipos Python / data-heavy</div>
+    </div>
+  </div>
+  <div v-click="5" flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg="zinc-900/50">
+    <div flex items-center gap-3><div i-logos:spring-icon text-2xl /><span text-lg font-semibold>Spring Boot</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Legado empresarial en JVM (aquí, Java 8)</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Bancos, seguros, gran escala regulada</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 /> Equipos Java con ciclos de vida largos</div>
+    </div>
+  </div>
+  <div v-click="6" flex flex-col gap-3 p-5 rounded-xl border border-sky-900 bg="sky-950/20">
+    <div flex items-center gap-3><img src="/elysia.svg" class="h-6"><span text-lg font-semibold>Elysia</span></div>
+    <div text-xs opacity-70 flex flex-col gap-1.5 mt-1>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 text-sky-400 /> Startups y productos nuevos</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 text-sky-400 /> APIs donde el rendimiento es dinero</div>
+      <div flex items-start gap-2><div i-carbon:arrow-right mt-0.5 shrink-0 text-sky-400 /> Full-stack TS: contrato compartido sin codegen</div>
     </div>
   </div>
 </div>
 
 <!--
 La decisión no es religiosa, es de contexto: código legado y conocimiento del
-equipo pesan más que cualquier benchmark. Elysia brilla cuando empiezas de cero
-con TypeScript en todo el stack y el time-to-market importa.
+equipo pesan más que cualquier benchmark. Fastify cubre el hueco "Node rápido
+sin el peso de Nest". Django sigue siendo el rey cuando el admin/ORM de
+fábrica ahorra semanas. Spring Boot, con Java 8, representa el escenario real
+de muchas empresas: no es el Java más nuevo, pero es el que corre en producción.
+Elysia brilla cuando empiezas de cero con TypeScript en todo el stack y el
+time-to-market importa.
 -->
 
 ---

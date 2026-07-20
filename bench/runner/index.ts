@@ -3,12 +3,16 @@
  * Mide por red interna de Docker con C conexiones concurrentes y transmite
  * cada latencia a la slide por Server-Sent Events.
  *
- *   GET /run?fw=express|nest|elysia&n=1000&c=50   → SSE: batch{dts[]} … done{avg,rps,errors}
+ *   GET /run?fw=express|fastify|nest|django|springboot|elysia&n=1000&c=50
+ *     → SSE: batch{dts[]} … done{avg,rps,errors}
  */
 
 const TARGETS: Record<string, string> = {
   express: process.env.TARGET_EXPRESS ?? 'http://express:3000/express',
+  fastify: process.env.TARGET_FASTIFY ?? 'http://fastify:3000/fastify',
   nest: process.env.TARGET_NEST ?? 'http://nest:3000/nest',
+  django: process.env.TARGET_DJANGO ?? 'http://django:3000/django',
+  springboot: process.env.TARGET_SPRINGBOOT ?? 'http://spring-boot:3000/springboot',
   elysia: process.env.TARGET_ELYSIA ?? 'http://elysia:3000/elysia',
 }
 
@@ -24,7 +28,7 @@ Bun.serve({
     const url = new URL(req.url)
 
     if (url.pathname !== '/run')
-      return new Response('runner ok — usa /run?fw=express|nest|elysia&n=1000&c=50', { headers: CORS })
+      return new Response('runner ok — usa /run?fw=express|fastify|nest|django|springboot|elysia&n=1000&c=50', { headers: CORS })
 
     const fw = url.searchParams.get('fw') ?? ''
     const target = TARGETS[fw]

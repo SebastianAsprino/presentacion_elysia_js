@@ -1,0 +1,10 @@
+{
+  "name": "bench-fastify",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "fastify": "^5.1.0"
+  }
+}
