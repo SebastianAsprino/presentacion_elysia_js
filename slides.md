@@ -579,7 +579,7 @@ zoom: 0.95
 
 <div text-sm opacity-50 mb-4>1000 peticiones reales por framework, en orden y contra el mismo servidor · Express → NestJS → Elysia</div>
 
-<LiveBench />
+<LiveBench default-base="https://prueba.asprino.dev" />
 
 <!--
 Nada de números de terceros: lo medimos aquí y ahora. Los tres servicios
