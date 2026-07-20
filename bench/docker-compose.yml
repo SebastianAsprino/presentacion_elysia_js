@@ -11,6 +11,14 @@ services:
     build: ./elysia
     restart: unless-stopped
 
+  runner:
+    build: ./runner
+    depends_on:
+      - express
+      - nest
+      - elysia
+    restart: unless-stopped
+
   gateway:
     image: nginx:alpine
     volumes:
@@ -19,4 +27,5 @@ services:
       - express
       - nest
       - elysia
+      - runner
     restart: unless-stopped

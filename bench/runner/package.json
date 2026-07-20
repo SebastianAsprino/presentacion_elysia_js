@@ -1,0 +1,8 @@
+{
+  "name": "bench-runner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun index.ts"
+  }
+}

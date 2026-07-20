@@ -1,0 +1,6 @@
+# Override SOLO para pruebas locales (Dokploy no lo usa):
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
+services:
+  gateway:
+    ports:
+      - "8080:80"

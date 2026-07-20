@@ -8,6 +8,7 @@ más un gateway nginx que los expone bajo una sola URL:
 | `/express` | express:3000 | Node 22 + Express 4 |
 | `/nest` | nest:3000 | Node 22 + NestJS 11 (adapter Express) |
 | `/elysia` | elysia:3000 | Bun 1 + Elysia 1 |
+| `/runner/run?fw=elysia&n=1000&c=50` | runner:3000 | Generador de carga estilo `oha` (Bun): mide por red interna con `c` conexiones concurrentes y transmite cada latencia por SSE — es el modo "servidor" de la slide |
 
 Todas las respuestas llevan `Access-Control-Allow-Origin: *` (la slide del
 benchmark hace fetch desde el navegador) y `Cache-Control: no-store` (para que
