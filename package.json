@@ -1,0 +1,21 @@
+{
+  "name": "presentacion-elysia-js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "env -u VSCODE_CWD slidev --open",
+    "build": "env -u VSCODE_CWD slidev build",
+    "export": "env -u VSCODE_CWD slidev export --with-clicks"
+  },
+  "devDependencies": {
+    "@iconify-json/carbon": "^1.2.11",
+    "@iconify-json/devicon": "^1.2.45",
+    "@iconify-json/logos": "^1.2.9",
+    "@iconify-json/simple-icons": "^1.2.55",
+    "@slidev/cli": "^52.11.0",
+    "@slidev/theme-default": "^0.25.0",
+    "@slidev/types": "^52.11.0",
+    "@types/seedrandom": "^3.0.8",
+    "seedrandom": "^3.0.5"
+  }
+}
