@@ -13,6 +13,7 @@ const base = ref(props.defaultBase ?? 'http://localhost:8080')
 const total = ref(props.defaultTotal ?? 1000)
 const running = ref(false)
 const errorMsg = ref('')
+const mode = ref<'server' | 'browser'>('server')
 
 interface FwState {
   count: number
@@ -144,11 +145,20 @@ function redraw() {
   }
 }
 
+let aborter: AbortController | null = null
+
+class CancelledError extends Error {}
+
 async function fetchOne(f: number, record: boolean) {
   const st = states.value[f]
   const t0 = performance.now()
   try {
-    const res = await fetch(`${base.value.replace(/\/$/, '')}/${FWS[f].key}`, { cache: 'no-store' })
+    const res = await fetch(`${base.value.replace(/\/$/, '')}/${FWS[f].key}`, {
+      cache: 'no-store',
+      // timeout por petición: una conexión colgada no puede congelar el run
+      signal: AbortSignal.any([aborter!.signal, AbortSignal.timeout(8000)]),
+    })
+    await res.text() // consumir el body: libera la conexión para reutilizarla
     const dt = performance.now() - t0
     if (!res.ok)
       throw new Error(`HTTP ${res.status}`)
@@ -159,11 +169,67 @@ async function fetchOne(f: number, record: boolean) {
     }
   }
   catch (e) {
+    if (aborter?.signal.aborted)
+      throw new CancelledError()
     if (record)
       st.errors++
     else
       throw e
   }
+}
+
+let currentEs: EventSource | null = null
+
+function cancel() {
+  aborter?.abort()
+  currentEs?.close()
+  currentEs = null
+}
+
+/** Modo servidor: el runner (colocado junto a los servicios) genera la carga
+ *  estilo `oha` y nos transmite cada latencia por SSE. */
+function runServerFw(f: number): Promise<void> {
+  const st = states.value[f]
+  return new Promise<void>((resolve, reject) => {
+    const url = `${base.value.replace(/\/$/, '')}/runner/run?fw=${FWS[f].key}&n=${total.value}&c=50`
+    const es = new EventSource(url)
+    currentEs = es
+
+    aborter!.signal.addEventListener('abort', () => {
+      es.close()
+      currentEs = null
+      reject(new CancelledError())
+    }, { once: true })
+
+    es.addEventListener('batch', (e) => {
+      const { dts } = JSON.parse((e as MessageEvent).data)
+      for (const dt of dts) {
+        samples[f].push(dt)
+        st.count++
+        st.sum += dt
+      }
+      scheduleRedraw()
+    })
+
+    es.addEventListener('done', (e) => {
+      const d = JSON.parse((e as MessageEvent).data)
+      st.errors = d.errors
+      st.avg = d.avg
+      st.rps = d.rps
+      es.close()
+      currentEs = null
+      resolve()
+    })
+
+    es.onerror = () => {
+      const cancelled = aborter?.signal.aborted
+      es.close()
+      currentEs = null
+      reject(cancelled
+        ? new CancelledError()
+        : new Error('runner no disponible — ¿desplegaste la versión con el servicio runner? (o cambia a modo Navegador)'))
+    }
+  })
 }
 
 async function run() {
@@ -174,6 +240,7 @@ async function run() {
   winner.value = null
   states.value = FWS.map(emptyState)
   samples = [[], [], []]
+  aborter = new AbortController()
   localStorage.setItem('elysia-bench-base', base.value)
   redraw()
 
@@ -182,39 +249,49 @@ async function run() {
       const st = states.value[f]
       st.running = true
 
-      // warm-up (no cuenta): despierta conexiones/JIT
-      await Promise.all(Array.from({ length: WARMUP }, () => fetchOne(f, false)))
+      if (mode.value === 'server') {
+        await runServerFw(f)
+      }
+      else {
+        // warm-up (no cuenta): despierta conexiones/JIT
+        await Promise.all(Array.from({ length: WARMUP }, () => fetchOne(f, false)))
 
-      const n = total.value
-      let next = 0
-      const t0 = performance.now()
-      await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
-        while (true) {
-          const i = next++
-          if (i >= n)
-            break
-          await fetchOne(f, true)
-          if ((i & 7) === 0)
-            scheduleRedraw()
-        }
-      }))
-      const wall = (performance.now() - t0) / 1000
+        const n = total.value
+        let next = 0
+        const t0 = performance.now()
+        await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
+          while (true) {
+            const i = next++
+            if (i >= n)
+              break
+            await fetchOne(f, true)
+            if ((i & 7) === 0)
+              scheduleRedraw()
+          }
+        }))
+        const wall = (performance.now() - t0) / 1000
+        st.avg = st.count ? st.sum / st.count : null
+        st.rps = wall > 0 ? Math.round(st.count / wall) : null
+      }
 
-      st.avg = st.count ? st.sum / st.count : null
-      st.rps = wall > 0 ? Math.round(st.count / wall) : null
       st.running = false
       st.done = true
       scheduleRedraw()
     }
 
     const avgs = states.value.map(s => s.avg ?? Number.POSITIVE_INFINITY)
-    winner.value = avgs.indexOf(Math.min(...avgs))
+    if (Math.min(...avgs) < Number.POSITIVE_INFINITY)
+      winner.value = avgs.indexOf(Math.min(...avgs))
   }
   catch (e: any) {
-    errorMsg.value = `No se pudo conectar con ${base.value} — ${e?.message ?? e}`
+    if (e instanceof CancelledError)
+      errorMsg.value = 'Cancelado.'
+    else
+      errorMsg.value = `No se pudo conectar con ${base.value} — ${e?.message ?? e}`
   }
   finally {
     running.value = false
+    aborter = null
   }
 }
 </script>
@@ -236,7 +313,8 @@ async function run() {
         <div class="flex flex-col leading-tight">
           <span class="font-semibold" :style="{ color: fw.color }">{{ fw.label }}</span>
           <span v-if="states[f].running" class="text-xs font-mono opacity-70 animate-pulse">
-            {{ states[f].count }} / {{ total }}…
+            {{ states[f].count + states[f].errors }} / {{ total }}…
+            <span v-if="states[f].errors" class="text-red-400">({{ states[f].errors }} err)</span>
           </span>
           <span v-else-if="states[f].done" class="text-sm font-mono">
             <b>{{ states[f].avg?.toFixed(1) }} ms</b>
@@ -251,6 +329,24 @@ async function run() {
 
     <!-- controles -->
     <div class="flex items-center gap-3">
+      <div class="flex rounded-lg border border-zinc-700 overflow-hidden text-xs font-mono shrink-0">
+        <button
+          :disabled="running"
+          class="px-3 py-1.5 transition"
+          :class="mode === 'server' ? 'bg-sky-500/20 text-sky-300' : 'opacity-50 hover:opacity-80'"
+          @click="mode = 'server'"
+        >
+          servidor
+        </button>
+        <button
+          :disabled="running"
+          class="px-3 py-1.5 transition border-l border-zinc-700"
+          :class="mode === 'browser' ? 'bg-fuchsia-500/20 text-fuchsia-300' : 'opacity-50 hover:opacity-80'"
+          @click="mode = 'browser'"
+        >
+          navegador
+        </button>
+      </div>
       <input
         v-model="base"
         :disabled="running"
@@ -264,11 +360,18 @@ async function run() {
         class="w-24 bg-zinc-900/80 border border-zinc-700 rounded-lg px-3 py-1.5 font-mono text-xs outline-none focus:border-sky-500"
       >
       <button
-        :disabled="running"
-        class="px-4 py-1.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#60a5fa] to-[#e879f9] disabled:opacity-40 hover:brightness-110 transition"
+        v-if="!running"
+        class="px-4 py-1.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#60a5fa] to-[#e879f9] hover:brightness-110 transition"
         @click="run"
       >
-        {{ running ? 'Corriendo…' : `Ejecutar 3 × ${total}` }}
+        Ejecutar 3 × {{ total }}
+      </button>
+      <button
+        v-else
+        class="px-4 py-1.5 rounded-lg font-semibold text-sm border border-red-400/60 text-red-300 hover:bg-red-500/10 transition"
+        @click="cancel"
+      >
+        Cancelar
       </button>
     </div>
 
