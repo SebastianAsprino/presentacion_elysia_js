@@ -787,6 +787,44 @@ glowSeed: 150
 </div>
 
 ---
+layout: center
+glow: bottom
+glowSeed: 118
+---
+
+<div flex items-center justify-center gap-14>
+  <img src="/elysia-chan.webp" class="max-h-[440px] drop-shadow-[0_0_40px_#e879f955]">
+  <div flex flex-col gap-5 max-w-sm>
+    <div text-sm tracking-widest opacity-50>Antes de seguir…</div>
+    <h1 text-4xl font-bold>Elysia-chan</h1>
+    <p text-lg opacity-80>El nombre viene de un personaje de <b>Honkai Impact 3rd</b> — la mascota oficial tiene su propio universo: ilustraciones, 4-komas, hasta nombres de versión.</p>
+    <p v-click text-sm opacity-50>El framework es muy otaku. El código, no tanto.</p>
+  </div>
+</div>
+
+<div absolute bottom-6 right-8 text-xs opacity-30>ilustración oficial · elysiajs.com/illust</div>
+
+<!--
+Aparte, ~40s, tono ligero — adelántate tú a la sorpresa antes de que la
+tengan ellos cuando entren a elysiajs.com por su cuenta.
+La mascota es real y "oficial": elysiajs.com/illust.html tiene ilustraciones,
+un cómic corto (4-koma) y hasta un sprite. El equipo lo dice explícito en esa
+página: "we believe that technology should be cute and fun instead of
+serious". No es un meme aislado, es una decisión de identidad de marca.
+Si quieres el remate con más peso (opcional, solo si el público está
+enganchado): el nombre y la mascota no son solo estética. El creador,
+SaltyAom (dev tailandés), venía de un proyecto con contrato injusto — meses
+casi sin parar, jornadas de ~15h, hasta el burnout. De ahí nace la obsesión
+del framework con la DX y con no romper compatibilidad: "no quiero que
+nadie más pase por algo así". La versión 1.0 la llamó "Lament of the
+Fallen", en honor a un corto animado de Honkai Impact con su personaje
+favorito — el mismo saco de dónde sale el nombre y la cara de Elysia-chan.
+Fuente: elysiajs.com/blog/elysia-10 (post oficial de la 1.0).
+Esto conecta directo con la slide de "Un schema, tres trabajos": la fijación
+por DX/tipos no es porque sí, viene de una experiencia real.
+-->
+
+---
 glow: left
 glowSeed: 70
 ---
