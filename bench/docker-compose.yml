@@ -1,27 +1,46 @@
+# Los 6 servicios comparados llevan el mismo límite de CPU/memoria (1 core,
+# 512 MB). Sin esto, Django (4 workers gunicorn) y Spring Boot (JVM) pueden
+# acaparar CPU del host frente a Elysia/Fastify (single-thread) y el orden
+# de la comparación deja de reflejar el framework para reflejar quién tenía
+# más núcleos libres en ese momento — ver bench/README.md § "Por qué el
+# resultado local no es el 6× de TechEmpower".
+x-fw-limits: &fw-limits
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 512M
+
 services:
   express:
     build: ./express
     restart: unless-stopped
+    <<: *fw-limits
 
   fastify:
     build: ./fastify
     restart: unless-stopped
+    <<: *fw-limits
 
   nest:
     build: ./nest
     restart: unless-stopped
+    <<: *fw-limits
 
   django:
     build: ./django
     restart: unless-stopped
+    <<: *fw-limits
 
   spring-boot:
     build: ./spring-boot
     restart: unless-stopped
+    <<: *fw-limits
 
   elysia:
     build: ./elysia
     restart: unless-stopped
+    <<: *fw-limits
 
   runner:
     build: ./runner

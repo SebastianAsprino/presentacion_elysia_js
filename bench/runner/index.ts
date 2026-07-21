@@ -48,9 +48,15 @@ Bun.serve({
           catch {} // cliente desconectado
         }
 
-        // warm-up (no cuenta): conexiones + JIT del servidor medido
-        await Promise.all(Array.from({ length: 30 }, () =>
+        // warm-up (no cuenta): conexiones + JIT del servidor medido.
+        // length = c*2: con solo 30 (fijo) un framework con más concurrencia
+        // (c=50+) arrancaba la parte medida con menos conexiones ya abiertas
+        // que otro, lo cual sesga sobre todo a Bun/Node en frío. También
+        // deja un respiro tras el test anterior (GC/JIT del framework previo
+        // asentándose) antes de arrancar el cronómetro.
+        await Promise.all(Array.from({ length: c * 2 }, () =>
           fetch(target).then(r => r.text()).catch(() => {})))
+        await new Promise(r => setTimeout(r, 200))
 
         let next = 0
         let count = 0

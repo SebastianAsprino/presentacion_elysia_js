@@ -567,6 +567,11 @@ glowSeed: 64
 Números del benchmark que publica la propia web de Elysia (TechEmpower R22).
 Matiz honesto: gran parte de la diferencia la pone Bun como runtime, y ningún
 benchmark sintético equivale a tu carga real. Pero el orden de magnitud importa.
+Nota para la próxima slide: el benchmark en vivo mide otra cosa (latencia con
+red real, concurrencia moderada) — no va a reproducir este 6×/21× y puede
+incluso invertir el orden puntualmente. Sembrar esa expectativa aquí si hay
+tiempo ("ahora lo medimos nosotros, con red real de por medio, así que la
+distancia se va a achicar mucho") evita que se lea como contradicción luego.
 -->
 
 ---
@@ -584,18 +589,24 @@ zoom: 0.95
 <!--
 Nada de números de terceros: lo medimos aquí y ahora. Los seis servicios
 devuelven el mismo "hello world" y corren en el mismo host (bench/ del repo,
-desplegado con docker compose). La carga la genera el servicio runner,
-colocado junto a los servicios, no el navegador de quien esté viendo la
-presentación — así el resultado no depende de la red de la sala ni del wifi
-del evento, que si no hacían que el número saltara de una corrida a otra y
-se perdía el punto de la demo.
+desplegado con docker compose, los 6 con el mismo límite de CPU/memoria para
+que sea justo). La carga la genera el servicio runner, colocado junto a los
+servicios, no el navegador de quien esté viendo la presentación — así el
+resultado no depende de la red de la sala ni del wifi del evento, que si no
+hacían que el número saltara de una corrida a otra y se perdía el punto de
+la demo.
 Se suman Fastify (Node), Django (Python) y Spring Boot (Java 8 — la versión
 "empresarial", no la última) para tener representación fuera del mundo
 Node.js y JS/TS.
-Advertir el matiz: aun así es un benchmark sintético (un solo endpoint, red
-interna de Docker) — el orden relativo importa más que el número exacto, y es
-menor que el 21× de TechEmpower porque ahí se mide throughput puro sin red de
-por medio.
+IMPORTANTE — decir esto ANTES de pulsar Ejecutar, no después: "esto mide
+latencia real por red, con concurrencia moderada y sin pipelining — es un
+experimento distinto al de TechEmpower (throughput puro, hardware dedicado),
+así que lo normal es que la distancia se achique mucho, y en alguna corrida
+hasta puede que Fastify quede primero o muy cerca de Elysia; eso no
+contradice la slide anterior, son dos cosas distintas". Dicho así de
+antemano, si Fastify gana esa corrida no es un error ni una sorpresa — es
+justo el punto didáctico (ver bench/README.md § "Por qué el resultado local
+no es el 6×/21× de TechEmpower" para el detalle técnico si preguntan).
 Si el runner no responde: el input permite cambiar la URL en vivo (p. ej.
 localhost:8080 con docker compose up local) y la slide anterior ya mostró el
 benchmark de referencia.
