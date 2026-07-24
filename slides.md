@@ -44,14 +44,20 @@ glowSeed: 128
     :class="$clicks < 1 ? 'translate-x--5 opacity-0' : 'translate-x-0 opacity-100'"
     flex flex-col items-start transition duration-500 ease-in-out min-w-70
   >
-    <div w-32 h-32 rounded-full mb-5 flex items-center justify-center text-6xl bg-gradient-to-br from="[#60a5fa30]" to="[#e879f930]">👨‍💻</div>
+    <div flex gap-4 mb-5>
+      <div flex flex-col items-center gap-2>
+        <img src="/qr-github.svg" class="w-28 h-28 rounded-lg bg-white p-1.5" />
+        <span text-xs opacity-60>GitHub</span>
+      </div>
+      <div flex flex-col items-center gap-2>
+        <img src="/qr-portfolio.svg" class="w-28 h-28 rounded-lg bg-white p-1.5" />
+        <span text-xs opacity-60>Portfolio</span>
+      </div>
+    </div>
     <span font-semibold text-3xl>Sebastián Asprino</span>
     <div>
       <div mt-1>
         <span class="opacity-70">Backend / Full-stack TypeScript</span>
-      </div>
-      <div text-sm flex items-center gap-2 mt-4>
-        <div i-carbon:logo-github /><span underline decoration-dashed font-mono decoration-zinc-300>saao</span>
       </div>
     </div>
   </div>
@@ -1044,13 +1050,14 @@ layout: center
 glowSeed: 233
 ---
 
-<div flex flex-col items-center gap-8>
-  <img src="/elysia_v.webp" class="max-h-56 drop-shadow-[0_0_35px_#60a5fa55]">
+<div flex flex-col items-center gap-4>
+  <img src="/elysia_v.webp" class="max-h-32 drop-shadow-[0_0_35px_#60a5fa55]">
   <h1 class="text-gradient-elysia" text-5xl font-bold>¡Gracias!</h1>
-  <div flex flex-col items-center gap-3 text-lg opacity-80>
+  <div flex flex-col items-center gap-2 text-lg opacity-80>
     <div flex items-center gap-2><div i-carbon:link /> elysiajs.com</div>
     <div flex items-center gap-2><div i-carbon:logo-github /> github.com/elysiajs/elysia</div>
   </div>
+  <img src="/qr-elysiajs.svg" class="w-20 h-20 rounded-lg bg-white p-1.5">
   <p text-sm opacity-40>¿Preguntas?</p>
 </div>
 
