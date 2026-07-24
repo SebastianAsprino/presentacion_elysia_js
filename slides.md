@@ -793,24 +793,40 @@ glowSeed: 118
 ---
 
 <div flex items-center justify-center gap-14>
-  <img src="/elysia-chan.webp" class="max-h-[440px] drop-shadow-[0_0_40px_#e879f955]">
-  <div flex flex-col gap-5 max-w-sm>
+  <div flex flex-col items-center gap-3>
+    <img src="/elysia-chan.webp" class="max-h-[380px] drop-shadow-[0_0_40px_#e879f955]">
+    <img src="/elysia-chan-chibi.gif" class="h-24 rounded-lg border border-zinc-800/70">
+  </div>
+  <div flex flex-col gap-4 max-w-md>
     <div text-sm tracking-widest opacity-50>Antes de seguir…</div>
     <h1 text-4xl font-bold>Elysia-chan</h1>
-    <p text-lg opacity-80>El nombre viene de un personaje de <b>Honkai Impact 3rd</b> — la mascota oficial tiene su propio universo: ilustraciones, 4-komas, hasta nombres de versión.</p>
+    <p text-lg opacity-80>El gif es <b>Elysia</b>, de <b>Honkai Impact 3rd</b> — personaje favorito del autor. De ahí el nombre y la mascota del framework.</p>
+    <p v-click text-base opacity-70>Y no se quedó ahí: cada versión estable lleva el nombre de una canción o referencia otaku favorita suya — <b>1.0</b> "Lament of the Fallen" (Honkai Impact 3rd), <b>0.8</b> "Gate of Steiner" (Steins;Gate), <b>0.6</b> "This Game" (No Game No Life)…</p>
     <p v-click text-sm opacity-50>El framework es muy otaku. El código, no tanto.</p>
   </div>
 </div>
 
-<div absolute bottom-6 right-8 text-xs opacity-30>ilustración oficial · elysiajs.com/illust</div>
+<div absolute bottom-6 right-8 text-xs opacity-30>ilustración oficial elysiajs.com/illust · gif vía Tenor</div>
 
 <!--
-Aparte, ~40s, tono ligero — adelántate tú a la sorpresa antes de que la
+Aparte, ~50s, tono ligero — adelántate tú a la sorpresa antes de que la
 tengan ellos cuando entren a elysiajs.com por su cuenta.
 La mascota es real y "oficial": elysiajs.com/illust.html tiene ilustraciones,
 un cómic corto (4-koma) y hasta un sprite. El equipo lo dice explícito en esa
 página: "we believe that technology should be cute and fun instead of
 serious". No es un meme aislado, es una decisión de identidad de marca.
+
+Sobre el personaje (por si quieres comentarlo, ~20s extra): el chibi del
+gif es Elysia, de Honkai Impact 3rd — el personaje favorito del autor
+(SaltyAom). No hace falta entrar en su rol dentro de la historia del
+juego, lo que importa para la charla es el patrón de nombres: cada versión
+*estable* de Elysia (el framework) se bautiza con una canción o referencia
+otaku que le gusta a él, y no siempre es de Honkai — 1.0 "Lament of the
+Fallen" sí es un corto animado de Honkai Impact 3rd, pero 0.8 "Gate of
+Steiner" es el tema principal de Steins;Gate y 0.6 "This Game" es el
+opening de No Game No Life (lista completa en elysiajs.com/blog.html).
+Es una firma personal suya en cada release, no una casualidad.
+
 Si quieres el remate con más peso (opcional, solo si el público está
 enganchado): el nombre y la mascota no son solo estética. El creador,
 SaltyAom (dev tailandés), venía de un proyecto con contrato injusto — meses
