@@ -1,4 +1,4 @@
-# Los 6 servicios comparados llevan el mismo límite de CPU/memoria (1 core,
+# Los 9 servicios comparados llevan el mismo límite de CPU/memoria (1 core,
 # 512 MB). Sin esto, Django (4 workers gunicorn) y Spring Boot (JVM) pueden
 # acaparar CPU del host frente a Elysia/Fastify (single-thread) y el orden
 # de la comparación deja de reflejar el framework para reflejar quién tenía
@@ -42,6 +42,21 @@ services:
     restart: unless-stopped
     <<: *fw-limits
 
+  spark:
+    build: ./spark
+    restart: unless-stopped
+    <<: *fw-limits
+
+  go:
+    build: ./go
+    restart: unless-stopped
+    <<: *fw-limits
+
+  rocket:
+    build: ./rocket
+    restart: unless-stopped
+    <<: *fw-limits
+
   runner:
     build: ./runner
     depends_on:
@@ -51,6 +66,9 @@ services:
       - django
       - spring-boot
       - elysia
+      - spark
+      - go
+      - rocket
     restart: unless-stopped
 
   gateway:
@@ -62,5 +80,8 @@ services:
       - django
       - spring-boot
       - elysia
+      - spark
+      - go
+      - rocket
       - runner
     restart: unless-stopped

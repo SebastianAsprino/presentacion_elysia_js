@@ -10,6 +10,9 @@ const FWS = [
   { key: 'django', label: 'Django', color: '#4ade80' },
   { key: 'springboot', label: 'Spring Boot', color: '#2dd4bf' },
   { key: 'elysia', label: 'Elysia', color: '#60a5fa' },
+  { key: 'spark', label: 'Spark', color: '#f97316' },
+  { key: 'go', label: 'Gin', color: '#06b6d4' },
+  { key: 'rocket', label: 'Rocket', color: '#a855f7' },
 ] as const
 
 const base = ref(props.defaultBase ?? 'http://localhost:8080')
@@ -260,6 +263,9 @@ async function run() {
         <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-3xl" />
         <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-3xl" />
         <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-3xl" />
+        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-3xl" />
+        <div v-else-if="fw.key === 'go'" class="i-logos:gin text-3xl" />
+        <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-3xl" />
         <img v-else src="/elysia.svg" class="h-8">
         <div class="flex flex-col leading-tight">
           <span class="font-semibold" :style="{ color: fw.color }">{{ fw.label }}</span>
