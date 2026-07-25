@@ -588,22 +588,22 @@ zoom: 0.95
 
 # Benchmark en vivo
 
-<div text-sm opacity-50 mb-4>1000 peticiones reales por framework, en orden y contra el mismo servidor · Express → Fastify → NestJS → Django → Spring Boot → Elysia</div>
+<div text-sm opacity-50 mb-4>1000 peticiones reales por framework, en orden y contra el mismo servidor · Express → Fastify → NestJS → Django → Spring Boot → Elysia → Spark → Gin → Rocket</div>
 
 <LiveBench default-base="https://prueba.asprino.dev" />
 
 <!--
-Nada de números de terceros: lo medimos aquí y ahora. Los seis servicios
+Nada de números de terceros: lo medimos aquí y ahora. Los nueve servicios
 devuelven el mismo "hello world" y corren en el mismo host (bench/ del repo,
-desplegado con docker compose, los 6 con el mismo límite de CPU/memoria para
+desplegado con docker compose, los 9 con el mismo límite de CPU/memoria para
 que sea justo). La carga la genera el servicio runner, colocado junto a los
 servicios, no el navegador de quien esté viendo la presentación — así el
 resultado no depende de la red de la sala ni del wifi del evento, que si no
 hacían que el número saltara de una corrida a otra y se perdía el punto de
 la demo.
-Se suman Fastify (Node), Django (Python) y Spring Boot (Java 8 — la versión
-"empresarial", no la última) para tener representación fuera del mundo
-Node.js y JS/TS.
+Se suman Fastify (Node), Django (Python), Spring Boot (Java 8 — la versión
+"empresarial", no la última), Spark (Java 17, micro-framework), Gin (Go) y
+Rocket (Rust) para tener representación fuera del mundo Node.js y JS/TS.
 IMPORTANTE — decir esto ANTES de pulsar Ejecutar, no después: "esto mide
 latencia real por red, con concurrencia moderada y sin pipelining — es un
 experimento distinto al de TechEmpower (throughput puro, hardware dedicado),
