@@ -28,10 +28,11 @@ interface FwState {
   rps: number | null
   running: boolean
   done: boolean
+  failed: boolean
 }
 
 function emptyState(): FwState {
-  return { count: 0, sum: 0, errors: 0, avg: null, rps: null, running: false, done: false }
+  return { count: 0, sum: 0, errors: 0, avg: null, rps: null, running: false, done: false, failed: false }
 }
 
 const states = ref<FwState[]>(FWS.map(emptyState))
@@ -224,13 +225,22 @@ async function run() {
     for (let f = 0; f < FWS.length; f++) {
       const st = states.value[f]
       st.running = true
-      await runFw(f)
+      try {
+        await runFw(f)
+      }
+      catch (e: any) {
+        // Un framework caído/lento no debe tumbar la demo entera: se marca
+        // como no disponible y se sigue con el resto. Cancelar sí para todo.
+        if (e instanceof CancelledError)
+          throw e
+        st.failed = true
+      }
       st.running = false
       st.done = true
       scheduleRedraw()
     }
 
-    const avgs = states.value.map(s => s.avg ?? Number.POSITIVE_INFINITY)
+    const avgs = states.value.map(s => s.failed ? Number.POSITIVE_INFINITY : s.avg ?? Number.POSITIVE_INFINITY)
     if (Math.min(...avgs) < Number.POSITIVE_INFINITY)
       winner.value = avgs.indexOf(Math.min(...avgs))
   }
@@ -272,6 +282,9 @@ async function run() {
           <span v-if="states[f].running" class="text-xs font-mono opacity-70 animate-pulse">
             {{ states[f].count + states[f].errors }} / {{ total }}…
             <span v-if="states[f].errors" class="text-red-400">({{ states[f].errors }} err)</span>
+          </span>
+          <span v-else-if="states[f].failed" class="text-sm font-mono text-red-400">
+            no disponible
           </span>
           <span v-else-if="states[f].done" class="text-sm font-mono">
             <b>{{ states[f].avg?.toFixed(1) }} ms</b>
