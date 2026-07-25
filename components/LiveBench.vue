@@ -258,69 +258,69 @@ async function run() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 w-full">
+  <div class="flex flex-col gap-2 w-full">
     <!-- los frameworks -->
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-3 gap-1.5">
       <div
         v-for="(fw, f) in FWS"
         :key="fw.key"
-        class="flex items-center gap-3 p-4 rounded-xl border transition-all duration-500"
+        class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-all duration-500"
         :class="winner === f ? 'border-transparent bg-gradient-to-r from-[#60a5fa1a] to-[#e879f91a] ring-1 ring-[#60a5fa]' : 'border-zinc-800 bg-zinc-900/50'"
         :style="states[f].running ? { borderColor: fw.color } : {}"
       >
-        <div v-if="fw.key === 'express'" class="i-simple-icons:express text-3xl text-white shrink-0" />
-        <div v-else-if="fw.key === 'fastify'" class="i-simple-icons:fastify text-3xl text-white shrink-0" />
-        <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-3xl shrink-0" />
-        <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-3xl shrink-0" />
-        <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-3xl shrink-0" />
-        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-3xl shrink-0" />
-        <div v-else-if="fw.key === 'go'" class="i-logos:gin text-3xl shrink-0" />
-        <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-3xl shrink-0" />
-        <img v-else src="/elysia.svg" class="h-8 shrink-0">
-        <div class="flex flex-col leading-tight min-w-0 flex-1 justify-center min-h-[2.25rem]">
-          <span class="font-semibold truncate" :style="{ color: fw.color }">{{ fw.label }}</span>
-          <span v-if="states[f].running" class="text-xs font-mono opacity-70 animate-pulse truncate">
+        <div v-if="fw.key === 'express'" class="i-simple-icons:express text-xl text-white shrink-0" />
+        <div v-else-if="fw.key === 'fastify'" class="i-simple-icons:fastify text-xl text-white shrink-0" />
+        <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-xl shrink-0" />
+        <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-xl shrink-0" />
+        <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-xl shrink-0" />
+        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-xl shrink-0" />
+        <div v-else-if="fw.key === 'go'" class="i-logos:gin text-xl shrink-0" />
+        <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-xl shrink-0" />
+        <img v-else src="/elysia.svg" class="h-5 shrink-0">
+        <div class="flex flex-col leading-tight min-w-0 flex-1 justify-center min-h-[1.75rem]">
+          <span class="font-semibold text-sm truncate" :style="{ color: fw.color }">{{ fw.label }}</span>
+          <span v-if="states[f].running" class="text-[10px] font-mono opacity-70 animate-pulse truncate">
             {{ states[f].count + states[f].errors }} / {{ total }}…
             <span v-if="states[f].errors" class="text-red-400">({{ states[f].errors }} err)</span>
           </span>
-          <span v-else-if="states[f].failed" class="text-sm font-mono text-red-400 truncate">
+          <span v-else-if="states[f].failed" class="text-xs font-mono text-red-400 truncate">
             no disponible
           </span>
-          <span v-else-if="states[f].done" class="text-sm font-mono truncate block">
+          <span v-else-if="states[f].done" class="text-xs font-mono truncate block">
             <b>{{ states[f].avg?.toFixed(1) }} ms</b>
-            <span class="opacity-60 text-xs"> prom · {{ states[f].rps }} req/s</span>
-            <span v-if="states[f].errors" class="text-red-400 text-xs"> · {{ states[f].errors }} err</span>
+            <span class="opacity-60 text-[10px]"> prom · {{ states[f].rps }} req/s</span>
+            <span v-if="states[f].errors" class="text-red-400 text-[10px]"> · {{ states[f].errors }} err</span>
           </span>
-          <span v-else class="text-xs opacity-40 font-mono truncate">esperando…</span>
+          <span v-else class="text-[10px] opacity-40 font-mono truncate">esperando…</span>
         </div>
-        <div v-if="winner === f" class="i-carbon:trophy-filled ml-auto text-xl text-yellow-300 shrink-0" />
+        <div v-if="winner === f" class="i-carbon:trophy-filled ml-auto text-base text-yellow-300 shrink-0" />
       </div>
     </div>
 
     <!-- controles -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <input
         v-model="base"
         :disabled="running"
-        class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-lg px-3 py-1.5 font-mono text-xs outline-none focus:border-sky-500"
+        class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-lg px-2.5 py-1 font-mono text-xs outline-none focus:border-sky-500"
         placeholder="https://bench.tudominio.com"
       >
       <input
         v-model.number="total"
         :disabled="running"
         type="number" min="10" step="10"
-        class="w-24 bg-zinc-900/80 border border-zinc-700 rounded-lg px-3 py-1.5 font-mono text-xs outline-none focus:border-sky-500"
+        class="w-20 bg-zinc-900/80 border border-zinc-700 rounded-lg px-2.5 py-1 font-mono text-xs outline-none focus:border-sky-500"
       >
       <button
         v-if="!running"
-        class="px-4 py-1.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#60a5fa] to-[#e879f9] hover:brightness-110 transition"
+        class="px-3 py-1 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#60a5fa] to-[#e879f9] hover:brightness-110 transition"
         @click="run"
       >
         Ejecutar {{ FWS.length }} × {{ total }}
       </button>
       <button
         v-else
-        class="px-4 py-1.5 rounded-lg font-semibold text-sm border border-red-400/60 text-red-300 hover:bg-red-500/10 transition"
+        class="px-3 py-1 rounded-lg font-semibold text-sm border border-red-400/60 text-red-300 hover:bg-red-500/10 transition"
         @click="cancel"
       >
         Cancelar
@@ -328,9 +328,9 @@ async function run() {
     </div>
 
     <!-- línea de tiempo -->
-    <canvas ref="canvasEl" class="w-full h-42 rounded-lg border border-zinc-800/80 bg-black/40" />
+    <canvas ref="canvasEl" class="w-full h-28 rounded-lg border border-zinc-800/80 bg-black/40" />
 
-    <div v-if="errorMsg" class="text-sm text-red-400 font-mono">
+    <div v-if="errorMsg" class="text-xs text-red-400 font-mono">
       {{ errorMsg }}
     </div>
   </div>
