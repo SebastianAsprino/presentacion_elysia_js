@@ -268,32 +268,32 @@ async function run() {
         :class="winner === f ? 'border-transparent bg-gradient-to-r from-[#60a5fa1a] to-[#e879f91a] ring-1 ring-[#60a5fa]' : 'border-zinc-800 bg-zinc-900/50'"
         :style="states[f].running ? { borderColor: fw.color } : {}"
       >
-        <div v-if="fw.key === 'express'" class="i-simple-icons:express text-3xl text-white" />
-        <div v-else-if="fw.key === 'fastify'" class="i-simple-icons:fastify text-3xl text-white" />
-        <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-3xl" />
-        <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-3xl" />
-        <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-3xl" />
-        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-3xl" />
-        <div v-else-if="fw.key === 'go'" class="i-logos:gin text-3xl" />
-        <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-3xl" />
-        <img v-else src="/elysia.svg" class="h-8">
-        <div class="flex flex-col leading-tight">
-          <span class="font-semibold" :style="{ color: fw.color }">{{ fw.label }}</span>
-          <span v-if="states[f].running" class="text-xs font-mono opacity-70 animate-pulse">
+        <div v-if="fw.key === 'express'" class="i-simple-icons:express text-3xl text-white shrink-0" />
+        <div v-else-if="fw.key === 'fastify'" class="i-simple-icons:fastify text-3xl text-white shrink-0" />
+        <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-3xl shrink-0" />
+        <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-3xl shrink-0" />
+        <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-3xl shrink-0" />
+        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-3xl shrink-0" />
+        <div v-else-if="fw.key === 'go'" class="i-logos:gin text-3xl shrink-0" />
+        <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-3xl shrink-0" />
+        <img v-else src="/elysia.svg" class="h-8 shrink-0">
+        <div class="flex flex-col leading-tight min-w-0 flex-1 justify-center min-h-[2.25rem]">
+          <span class="font-semibold truncate" :style="{ color: fw.color }">{{ fw.label }}</span>
+          <span v-if="states[f].running" class="text-xs font-mono opacity-70 animate-pulse truncate">
             {{ states[f].count + states[f].errors }} / {{ total }}…
             <span v-if="states[f].errors" class="text-red-400">({{ states[f].errors }} err)</span>
           </span>
-          <span v-else-if="states[f].failed" class="text-sm font-mono text-red-400">
+          <span v-else-if="states[f].failed" class="text-sm font-mono text-red-400 truncate">
             no disponible
           </span>
-          <span v-else-if="states[f].done" class="text-sm font-mono">
+          <span v-else-if="states[f].done" class="text-sm font-mono truncate block">
             <b>{{ states[f].avg?.toFixed(1) }} ms</b>
             <span class="opacity-60 text-xs"> prom · {{ states[f].rps }} req/s</span>
             <span v-if="states[f].errors" class="text-red-400 text-xs"> · {{ states[f].errors }} err</span>
           </span>
-          <span v-else class="text-xs opacity-40 font-mono">esperando…</span>
+          <span v-else class="text-xs opacity-40 font-mono truncate">esperando…</span>
         </div>
-        <div v-if="winner === f" class="i-carbon:trophy-filled ml-auto text-xl text-yellow-300" />
+        <div v-if="winner === f" class="i-carbon:trophy-filled ml-auto text-xl text-yellow-300 shrink-0" />
       </div>
     </div>
 
