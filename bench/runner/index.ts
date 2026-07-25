@@ -3,7 +3,7 @@
  * Mide por red interna de Docker con C conexiones concurrentes y transmite
  * cada latencia a la slide por Server-Sent Events.
  *
- *   GET /run?fw=express|fastify|nest|django|springboot|elysia|spark|go|rocket&n=1000&c=50
+ *   GET /run?fw=express|fastify|nest|django|springboot|elysia|quarkus|go|rocket&n=1000&c=50
  *     → SSE: batch{dts[]} … done{avg,rps,errors}
  */
 
@@ -14,7 +14,7 @@ const TARGETS: Record<string, string> = {
   django: process.env.TARGET_DJANGO ?? 'http://django:3000/django',
   springboot: process.env.TARGET_SPRINGBOOT ?? 'http://spring-boot:3000/springboot',
   elysia: process.env.TARGET_ELYSIA ?? 'http://elysia:3000/elysia',
-  spark: process.env.TARGET_SPARK ?? 'http://spark:3000/spark',
+  quarkus: process.env.TARGET_QUARKUS ?? 'http://quarkus:3000/quarkus',
   go: process.env.TARGET_GO ?? 'http://go:3000/go',
   rocket: process.env.TARGET_ROCKET ?? 'http://rocket:3000/rocket',
 }
@@ -31,7 +31,7 @@ Bun.serve({
     const url = new URL(req.url)
 
     if (url.pathname !== '/run')
-      return new Response('runner ok — usa /run?fw=express|fastify|nest|django|springboot|elysia|spark|go|rocket&n=1000&c=50', { headers: CORS })
+      return new Response('runner ok — usa /run?fw=express|fastify|nest|django|springboot|elysia|quarkus|go|rocket&n=1000&c=50', { headers: CORS })
 
     const fw = url.searchParams.get('fw') ?? ''
     const target = TARGETS[fw]

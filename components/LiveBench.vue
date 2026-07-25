@@ -10,7 +10,7 @@ const FWS = [
   { key: 'django', label: 'Django', color: '#4ade80' },
   { key: 'springboot', label: 'Spring Boot', color: '#2dd4bf' },
   { key: 'elysia', label: 'Elysia', color: '#60a5fa' },
-  { key: 'spark', label: 'Spark', color: '#f97316' },
+  { key: 'quarkus', label: 'Quarkus', color: '#f97316' },
   { key: 'go', label: 'Gin', color: '#06b6d4' },
   { key: 'rocket', label: 'Rocket', color: '#a855f7' },
 ] as const
@@ -273,7 +273,7 @@ async function run() {
         <div v-else-if="fw.key === 'nest'" class="i-logos:nestjs text-xl shrink-0" />
         <div v-else-if="fw.key === 'django'" class="i-logos:django-icon text-xl shrink-0" />
         <div v-else-if="fw.key === 'springboot'" class="i-logos:spring-icon text-xl shrink-0" />
-        <div v-else-if="fw.key === 'spark'" class="i-logos:java text-xl shrink-0" />
+        <div v-else-if="fw.key === 'quarkus'" class="i-logos:quarkus text-xl shrink-0" />
         <div v-else-if="fw.key === 'go'" class="i-logos:gin text-xl shrink-0" />
         <div v-else-if="fw.key === 'rocket'" class="i-logos:rust text-xl shrink-0" />
         <img v-else src="/elysia.svg" class="h-5 shrink-0">
