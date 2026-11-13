@@ -1,1 +1,26 @@
-node_modules
+# Dependencias
+node_modules/
+
+# Builds (Slidev, Nest, Maven, Cargo, Go)
+dist/
+target/
+bench/go/bench-go
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Exportaciones de Slidev
+slides-export*
+
+# Editor / sistema
+.directory
+.DS_Store
+.vscode/
+.idea/
+
+# Variables de entorno locales
+.env
+.env.*
+!.env.example

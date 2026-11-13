@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,5 +23,7 @@ func main() {
 	r.GET("/", hello)
 	r.GET("/go", hello)
 
-	r.Run(":3000")
+	if err := r.Run(":3000"); err != nil {
+		log.Fatal(err)
+	}
 }

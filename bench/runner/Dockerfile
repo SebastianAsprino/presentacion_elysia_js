@@ -1,5 +1,7 @@
 FROM oven/bun:1-alpine
 WORKDIR /app
 COPY index.ts ./
+# Imagen oficial de Bun: ya trae el usuario sin privilegios `bun`.
+USER bun
 EXPOSE 3000
 CMD ["bun", "index.ts"]

@@ -19,6 +19,25 @@ const TARGETS: Record<string, string> = {
   rocket: process.env.TARGET_ROCKET ?? 'http://rocket:3000/rocket',
 }
 
+const DEFAULT_REQUESTS = 1000
+const MAX_REQUESTS = 20_000
+const DEFAULT_CONCURRENCY = 50
+const MAX_CONCURRENCY = 200
+const REQUEST_TIMEOUT_MS = 5000
+const WARMUP_PAUSE_MS = 200
+const BATCH_SIZE = 20
+
+/**
+ * Lee un entero de la query acotado a [1, max]. Un valor no numérico (`n=abc`)
+ * cae al valor por defecto: con NaN el bucle de carga nunca terminaba.
+ */
+function boundedInt(raw: string | null, fallback: number, max: number): number {
+  const parsed = Number.parseInt(raw ?? '', 10)
+  if (Number.isNaN(parsed))
+    return fallback
+  return Math.min(max, Math.max(1, parsed))
+}
+
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Cache-Control': 'no-store',
@@ -38,8 +57,8 @@ Bun.serve({
     if (!target)
       return new Response('fw desconocido', { status: 400, headers: CORS })
 
-    const n = Math.min(20000, Math.max(1, Number(url.searchParams.get('n') ?? 1000)))
-    const c = Math.min(200, Math.max(1, Number(url.searchParams.get('c') ?? 50)))
+    const n = boundedInt(url.searchParams.get('n'), DEFAULT_REQUESTS, MAX_REQUESTS)
+    const c = boundedInt(url.searchParams.get('c'), DEFAULT_CONCURRENCY, MAX_CONCURRENCY)
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -48,7 +67,9 @@ Bun.serve({
           try {
             controller.enqueue(enc.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`))
           }
-          catch {} // cliente desconectado
+          catch {
+            // El cliente cerró el EventSource: no hay a quién enviar, se descarta.
+          }
         }
 
         // warm-up (no cuenta): conexiones + JIT del servidor medido.
@@ -59,7 +80,7 @@ Bun.serve({
         // asentándose) antes de arrancar el cronómetro.
         await Promise.all(Array.from({ length: c * 2 }, () =>
           fetch(target).then(r => r.text()).catch(() => {})))
-        await new Promise(r => setTimeout(r, 200))
+        await new Promise(r => setTimeout(r, WARMUP_PAUSE_MS))
 
         let next = 0
         let count = 0
@@ -75,7 +96,7 @@ Bun.serve({
               break
             const s = performance.now()
             try {
-              const res = await fetch(target, { signal: AbortSignal.timeout(5000) })
+              const res = await fetch(target, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
               await res.text()
               if (!res.ok)
                 throw new Error(`HTTP ${res.status}`)
@@ -83,7 +104,7 @@ Bun.serve({
               sum += dt
               count++
               batch.push(Math.round(dt * 1000) / 1000)
-              if (batch.length >= 20) {
+              if (batch.length >= BATCH_SIZE) {
                 send('batch', { dts: batch })
                 batch = []
               }

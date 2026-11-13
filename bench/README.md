@@ -45,8 +45,11 @@ no-store` (para permitir probarlas sueltas con fetch/curl sin cachear).
 
 ## Prueba local (opcional)
 
+El puerto `8080` del gateway solo se publica con el override local
+(`docker-compose.local.yml`; Dokploy no lo usa):
+
 ```bash
-docker compose up --build
+docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
 curl localhost:8080/express localhost:8080/fastify localhost:8080/nest \
      localhost:8080/django localhost:8080/springboot localhost:8080/elysia \
      localhost:8080/quarkus localhost:8080/go localhost:8080/rocket

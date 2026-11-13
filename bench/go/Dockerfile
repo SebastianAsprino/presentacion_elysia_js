@@ -8,5 +8,7 @@ RUN CGO_ENABLED=0 go build -o bench-go .
 FROM alpine:3.20
 WORKDIR /app
 COPY --from=build /app/bench-go ./
+RUN adduser -D -H app
+USER app
 EXPOSE 3000
 CMD ["./bench-go"]

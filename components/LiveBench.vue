@@ -15,6 +15,29 @@ const FWS = [
   { key: 'rocket', label: 'Rocket', color: '#a855f7' },
 ] as const
 
+const STORAGE_KEY = 'elysia-bench-base'
+const CONCURRENCY = 50
+
+// localStorage puede lanzar (modo privado, almacenamiento bloqueado): recordar
+// la URL es solo una comodidad, así que un fallo se ignora.
+function readSavedBase(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY)
+  }
+  catch {
+    return null
+  }
+}
+
+function saveBase(value: string) {
+  try {
+    localStorage.setItem(STORAGE_KEY, value)
+  }
+  catch {
+    // Sin almacenamiento disponible: la URL simplemente no se recuerda.
+  }
+}
+
 const base = ref(props.defaultBase ?? 'http://localhost:8080')
 const total = ref(props.defaultTotal ?? 1000)
 const running = ref(false)
@@ -42,7 +65,7 @@ const canvasEl = ref<HTMLCanvasElement>()
 let samples: number[][] = FWS.map(() => [])
 
 onMounted(() => {
-  const saved = localStorage.getItem('elysia-bench-base')
+  const saved = readSavedBase()
   if (saved && !props.defaultBase)
     base.value = saved
   redraw()
@@ -155,6 +178,15 @@ class CancelledError extends Error {}
 
 let currentEs: EventSource | null = null
 
+function parseEvent<T>(e: Event): T | null {
+  try {
+    return JSON.parse((e as MessageEvent).data) as T
+  }
+  catch {
+    return null
+  }
+}
+
 function cancel() {
   aborter?.abort()
   currentEs?.close()
@@ -168,19 +200,24 @@ function cancel() {
 function runFw(f: number): Promise<void> {
   const st = states.value[f]
   return new Promise<void>((resolve, reject) => {
-    const url = `${base.value.replace(/\/$/, '')}/runner/run?fw=${FWS[f].key}&n=${total.value}&c=50`
+    const url = `${base.value.replace(/\/$/, '')}/runner/run?fw=${FWS[f].key}&n=${total.value}&c=${CONCURRENCY}`
     const es = new EventSource(url)
     currentEs = es
 
-    aborter!.signal.addEventListener('abort', () => {
+    // Un payload malformado no debe dejar la promesa colgada para siempre.
+    const fail = (error: Error) => {
       es.close()
       currentEs = null
-      reject(new CancelledError())
-    }, { once: true })
+      reject(error)
+    }
+
+    aborter?.signal.addEventListener('abort', () => fail(new CancelledError()), { once: true })
 
     es.addEventListener('batch', (e) => {
-      const { dts } = JSON.parse((e as MessageEvent).data)
-      for (const dt of dts) {
+      const payload = parseEvent<{ dts: number[] }>(e)
+      if (!payload)
+        return fail(new Error('respuesta inválida del runner'))
+      for (const dt of payload.dts) {
         samples[f].push(dt)
         st.count++
         st.sum += dt
@@ -189,7 +226,9 @@ function runFw(f: number): Promise<void> {
     })
 
     es.addEventListener('done', (e) => {
-      const d = JSON.parse((e as MessageEvent).data)
+      const d = parseEvent<{ errors: number, avg: number | null, rps: number | null }>(e)
+      if (!d)
+        return fail(new Error('respuesta inválida del runner'))
       st.errors = d.errors
       st.avg = d.avg
       st.rps = d.rps
@@ -199,10 +238,7 @@ function runFw(f: number): Promise<void> {
     })
 
     es.onerror = () => {
-      const cancelled = aborter?.signal.aborted
-      es.close()
-      currentEs = null
-      reject(cancelled
+      fail(aborter?.signal.aborted
         ? new CancelledError()
         : new Error('runner no disponible — ¿desplegaste la versión con el servicio runner?'))
     }
@@ -218,7 +254,7 @@ async function run() {
   states.value = FWS.map(emptyState)
   samples = FWS.map(() => [])
   aborter = new AbortController()
-  localStorage.setItem('elysia-bench-base', base.value)
+  saveBase(base.value)
   redraw()
 
   try {
@@ -228,7 +264,7 @@ async function run() {
       try {
         await runFw(f)
       }
-      catch (e: any) {
+      catch (e: unknown) {
         // Un framework caído/lento no debe tumbar la demo entera: se marca
         // como no disponible y se sigue con el resto. Cancelar sí para todo.
         if (e instanceof CancelledError)
@@ -244,11 +280,11 @@ async function run() {
     if (Math.min(...avgs) < Number.POSITIVE_INFINITY)
       winner.value = avgs.indexOf(Math.min(...avgs))
   }
-  catch (e: any) {
+  catch (e: unknown) {
     if (e instanceof CancelledError)
       errorMsg.value = 'Cancelado.'
     else
-      errorMsg.value = `No se pudo conectar con ${base.value} — ${e?.message ?? e}`
+      errorMsg.value = `No se pudo conectar con ${base.value} — ${e instanceof Error ? e.message : String(e)}`
   }
   finally {
     running.value = false

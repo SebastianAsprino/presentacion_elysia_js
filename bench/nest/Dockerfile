@@ -11,5 +11,7 @@ ENV NODE_ENV=production
 COPY package.json ./
 RUN npm install --omit=dev
 COPY --from=build /app/dist ./dist
+# Imagen oficial de Node: ya trae el usuario sin privilegios `node`.
+USER node
 EXPOSE 3000
 CMD ["node", "dist/main.js"]

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  slides:
+    name: Build slides (Slidev)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+
+  bench-go:
+    name: Vet + build bench/go
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bench/go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bench/go/go.mod
+      - run: go vet ./...
+      - run: go build ./...

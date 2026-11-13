@@ -8,4 +8,7 @@ async function bootstrap() {
   console.log('nest listening on :3000')
 }
 
-bootstrap()
+bootstrap().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})

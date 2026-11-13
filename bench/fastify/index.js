@@ -13,6 +13,10 @@ async function hello(req, reply) {
 fastify.get('/', hello)
 fastify.get('/fastify', hello)
 
-fastify.listen({ port: 3000, host: '0.0.0.0' }, () => {
+fastify.listen({ port: 3000, host: '0.0.0.0' }, (err) => {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }
   console.log('fastify listening on :3000')
 })

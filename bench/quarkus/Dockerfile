@@ -11,5 +11,7 @@ COPY --from=build /app/target/quarkus-app/lib/ ./lib/
 COPY --from=build /app/target/quarkus-app/*.jar ./
 COPY --from=build /app/target/quarkus-app/app/ ./app/
 COPY --from=build /app/target/quarkus-app/quarkus/ ./quarkus/
+RUN adduser -D -H app
+USER app
 EXPOSE 3000
 CMD ["java", "-jar", "quarkus-run.jar"]

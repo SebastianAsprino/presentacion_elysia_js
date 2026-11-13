@@ -5,6 +5,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY manage.py ./
 COPY benchsite ./benchsite
+RUN useradd --system --no-create-home app
+USER app
 EXPOSE 3000
 # 4 workers: gunicorn es multi-proceso (no event-loop), necesita varios
 # procesos para no serializar las peticiones concurrentes del runner.

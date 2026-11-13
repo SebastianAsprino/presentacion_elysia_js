@@ -8,5 +8,7 @@ RUN mvn -B -DskipTests package
 FROM eclipse-temurin:8-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/bench-spring-boot.jar ./app.jar
+RUN adduser -D -H app
+USER app
 EXPOSE 3000
 CMD ["java", "-jar", "app.jar"]
